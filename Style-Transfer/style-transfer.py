@@ -31,7 +31,7 @@ parser = argparse.ArgumentParser(description='Image neural style transfer implem
 parser.add_argument('content_img', metavar='content', type=str, help='Path to target content image')
 parser.add_argument('style_img', metavar='style', type=str, help='Path to target style image')
 parser.add_argument('result_img_prefix', metavar='res_prefix', type=str, help='Name of generated image')
-parser.add_argument('--iter', type=int, default=10, required=False, help='Number of iterations to run')
+parser.add_argument('--iter', type=int, default=100, required=False, help='Number of iterations to run')
 parser.add_argument('--content_weight', type=float, default=0.025, required=False, help='Content weight')
 parser.add_argument('--style_weight', type=float, default=1.0, required=False, help='Style weight')
 parser.add_argument('--var_weight', type=float, default=1.0, required=False, help='Total Variation weight')
@@ -47,9 +47,12 @@ img_width = args.width
 img_size = img_height * img_width
 img_channels = 3
 
-content_path = args.content_img
-style_path = args.style_img
-target_path = args.result_img_prefix
+#content_path = args.content_img
+content_path = 'images/tesla-little.jpg'
+#style_path = args.style_img
+style_path = 'images/tree2.jpg'
+#target_path = args.result_img_prefix
+target_path = 'output/generated1'
 target_extension = '.png'
 
 CONTENT_IMAGE_POS = 0
@@ -251,6 +254,7 @@ class Evaluator(object):
 
 
 if __name__ == '__main__':
+
     # Prepare the generated image
     generated_img = np.random.uniform(0, 255, (1, img_height, img_width, 3)) - 128.
 
