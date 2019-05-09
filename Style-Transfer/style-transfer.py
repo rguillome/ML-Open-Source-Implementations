@@ -48,11 +48,11 @@ img_size = img_height * img_width
 img_channels = 3
 
 #content_path = args.content_img
-content_path = 'images/tesla-little.jpg'
+content_path = './Style-Transfer/images/tesla-little.jpg'
 #style_path = args.style_img
-style_path = 'images/tree2.jpg'
+style_path = './Style-Transfer/images/tree2.jpg'
 #target_path = args.result_img_prefix
-target_path = 'output/generated1'
+target_path = './Style-Transfer/outputs/generated1'
 target_extension = '.png'
 
 CONTENT_IMAGE_POS = 0
