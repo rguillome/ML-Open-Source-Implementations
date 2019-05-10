@@ -26,17 +26,24 @@ from scipy.misc import imsave
 
 import argparse
 
+import os
+content_path = os.getenv("CONTENT_PATH")
+style_path = os.getenv("STYLE_PATH")
+target_path = os.getenv("OUTPUT_PATH")
+iterations = os.getenv("ITERATION")
 
 parser = argparse.ArgumentParser(description='Image neural style transfer implemented with Keras')
-#parser.add_argument('content_img', metavar='content', type=str, help='Path to target content image')
-#parser.add_argument('style_img', metavar='style', type=str, help='Path to target style image')
-#parser.add_argument('result_img_prefix', metavar='res_prefix', type=str, help='Name of generated image')
+parser.add_argument('content_img', metavar='content', type=str, required=False, help='Path to target content image')
+parser.add_argument('style_img', metavar='style', type=str, required=False, help='Path to target style image')
+parser.add_argument('result_img_prefix', metavar='res_prefix', type=str, required=False, help='Name of generated image')
 parser.add_argument('--iter', type=int, default=100, required=False, help='Number of iterations to run')
 parser.add_argument('--content_weight', type=float, default=0.025, required=False, help='Content weight')
 parser.add_argument('--style_weight', type=float, default=1.0, required=False, help='Style weight')
 parser.add_argument('--var_weight', type=float, default=1.0, required=False, help='Total Variation weight')
 parser.add_argument('--height', type=int, default=512, required=False, help='Height of the images')
 parser.add_argument('--width', type=int, default=512, required=False, help='Width of the images')
+
+ 	
 
 args = parser.parse_args()
 
@@ -47,12 +54,15 @@ img_width = args.width
 img_size = img_height * img_width
 img_channels = 3
 
-#content_path = args.content_img
-content_path = './Style-Transfer/images/tesla-little.jpg'
-#style_path = args.style_img
-style_path = './Style-Transfer/images/tree2.jpg'
-#target_path = args.result_img_prefix
-target_path = './Style-Transfer/outputs/generated1'
+if args.content_img:
+    content_path = args.content_img
+
+if args.style_img:
+    style_path = args.style_img
+
+if args.result_img_prefix:
+    target_path = args.result_img_prefix
+
 target_extension = '.png'
 
 CONTENT_IMAGE_POS = 0
@@ -281,7 +291,9 @@ if __name__ == '__main__':
     f_outputs = K.function([generated_image], outputs)
 
     evaluator = Evaluator()
-    iterations = args.iter
+
+    if args.iter:
+        iterations = args.iter
 
     name = '{}-{}{}'.format(target_path, 0, target_extension)
     save_image(name, generated_img)
