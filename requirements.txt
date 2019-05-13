@@ -2,7 +2,7 @@ numpy==1.15.2
 scipy==1.1.0
 keras==2.2.4
 Pillow==6.0.0
-tensorflow_gpu==1.4.0
+tensorflow_gpu==1.13.1
 boto==2.49.0
 ndg-httpsclient==0.5.1
 pyopenssl==19.0.0
