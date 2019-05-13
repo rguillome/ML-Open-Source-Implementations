@@ -27,15 +27,24 @@ from scipy.misc import imsave
 import argparse
 
 import os
+
+from  cloud_lib.cloud_s3_storage import CloudS3Storage
+
+import io
+
+connection = CloudS3Storage()
+
 content_path = os.getenv("CONTENT_PATH")
 style_path = os.getenv("STYLE_PATH")
 target_path = os.getenv("OUTPUT_PATH")
 iterations = os.getenv("ITERATION")
 
+print("Content img:",content_path)
+print("Style img:",style_path)
+print("Output prefix:",target_path)
+print("Nb iteration:",iterations)
+
 parser = argparse.ArgumentParser(description='Image neural style transfer implemented with Keras')
-parser.add_argument('content_img', metavar='content', type=str, required=False, help='Path to target content image')
-parser.add_argument('style_img', metavar='style', type=str, required=False, help='Path to target style image')
-parser.add_argument('result_img_prefix', metavar='res_prefix', type=str, required=False, help='Name of generated image')
 parser.add_argument('--iter', type=int, default=100, required=False, help='Number of iterations to run')
 parser.add_argument('--content_weight', type=float, default=0.025, required=False, help='Content weight')
 parser.add_argument('--style_weight', type=float, default=1.0, required=False, help='Style weight')
@@ -54,15 +63,6 @@ img_width = args.width
 img_size = img_height * img_width
 img_channels = 3
 
-if args.content_img:
-    content_path = args.content_img
-
-if args.style_img:
-    style_path = args.style_img
-
-if args.result_img_prefix:
-    target_path = args.result_img_prefix
-
 target_extension = '.png'
 
 CONTENT_IMAGE_POS = 0
@@ -72,14 +72,22 @@ GENERATED_IMAGE_POS = 2
 # Params #
 
 
-def process_img(path):
+def process_img(object_id):
+
     """
     Function for processing images to the format we need
     :param path: The path to the image
     :return: The image as a data array, scaled and reflected
     """
+    print("Process image", object_id)
     # Open image and resize it
-    img = Image.open(path)
+    data = connection.read_file_as_string('input',object_id)
+
+    print(len(data))
+
+    img_bytes = io.BytesIO(data)
+
+    img = Image.open(img_bytes)
     img = img.resize((img_width, img_height))
 
     # Convert image to data array
@@ -236,7 +244,15 @@ def save_image(filename, generated):
     # Clip values to 0-255
     generated = np.clip(generated, 0, 255).astype('uint8')
 
-    imsave(filename, Image.fromarray(generated))
+    bucket_name='output'
+
+    with io.BytesIO() as output:
+        image = Image.fromarray(generated)
+        image.save(output,format='PNG')
+        content = output.getvalue()
+
+        print('save image', filename,'under bucket',bucket_name,'and size is',len(content))
+        connection.upload_file_from_str(bucket_name,filename, content)
 
 
 class Evaluator(object):
